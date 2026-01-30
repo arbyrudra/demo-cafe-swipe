@@ -1,3 +1,45 @@
 {
-  "config":{}, "items":[]
+  "config": {},
+  "items": [
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "qwertyuioplkjhgfdszxvbn",
+      "ingredients": "asd asd asd asd ",
+      "tag": "Chef's Choice",
+      "image": "images/dish-1769761069969.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹2999",
+      "desc": "qazxcvbnmklkjhgfdwertyuiijbsdfgb",
+      "ingredients": "qazwsx dcrfv tgbyhn ",
+      "tag": "Veg",
+      "image": "images/dish-1769761063875.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹399",
+      "desc": "qakjertyukikwertyuhjkmnbvgfdfghjm,kmnb cvd",
+      "ingredients": "ertyjdfghcvb xcvbnsdfgh erty sdfg cvbn",
+      "tag": "Sweet",
+      "image": "images/dish-1769761059989.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹799",
+      "desc": "",
+      "ingredients": "qwert fghj bn kjhg",
+      "tag": "Spicy",
+      "image": "images/dish-1769761057338.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹899",
+      "desc": "mnbvcxjhgfduytr",
+      "ingredients": "jhgfd nbvc iuytr ",
+      "tag": "Veg",
+      "image": "images/dish-1769761054684.jpg"
+    }
+  ]
 }
