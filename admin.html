@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{ --bg: #0b0b0f; --surface: #15151a; --input-bg: #000000; --border: #2a2a35; --accent: #FFD700; --accent-glow: rgba(255, 215, 0, 0.2); --danger: #ff4b4b; --success: #00d26a; --text-main: #ffffff; --text-muted: #8f8f9b; }
+* { box-sizing: border-box; outline: none; }
+body{ background: radial-gradient(circle at top center, #1f1f2e 0%, var(--bg) 80%); color: var(--text-main); font-family: 'Outfit', sans-serif; margin: 0; padding: 0; min-height: 100vh; padding-bottom: 100px; }
+#loginScreen{ position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; align-items: center; justify-content: center; z-index: 9999; transition: opacity 0.5s ease; }
+.login-box{ background: var(--surface); padding: 40px; width: 100%; max-width: 360px; border-radius: 24px; border: 1px solid var(--border); text-align: center; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+.login-icon { font-size: 2.5rem; color: var(--accent); margin-bottom: 15px; display: inline-block; filter: drop-shadow(0 0 10px var(--accent-glow)); }
+.login-box h2{ color: #fff; margin: 0 0 30px 0; font-weight: 700; letter-spacing: 1px; }
+.input-group { position: relative; margin-bottom: 15px; }
+.input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.login-box input{ width: 100%; padding: 14px 14px 14px 45px; background: var(--input-bg); border: 1px solid var(--border); color: #fff; border-radius: 12px; font-size: 0.95rem; transition: 0.3s; }
+.login-box input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.login-box button{ width: 100%; padding: 14px; background: var(--accent); color: #000; border: none; font-weight: 700; font-size: 1rem; border-radius: 12px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+.login-error{ margin-top: 15px; color: var(--danger); font-size: 0.85rem; background: rgba(255, 75, 75, 0.1); padding: 10px; border-radius: 8px; display: none; }
+#adminPanel { display: none; animation: fadeIn 0.8s ease; }
+@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+#loader { position: fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.8); z-index:99999; display:none; justify-content:center; align-items:center; flex-direction:column; backdrop-filter: blur(5px); }
+.spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.admin-header{ max-width: 900px; margin: 20px auto 40px; display: flex; justify-content: space-between; align-items: center; background: rgba(21, 21, 26, 0.8); backdrop-filter: blur(12px); padding: 15px 25px; border-radius: 16px; border: 1px solid var(--border); position: sticky; top: 20px; z-index: 100; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.admin-header h1{ color: #fff; margin: 0; font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+.admin-header h1 i { color: var(--accent); }
+.header-actions{ display: flex; gap: 10px; }
+#dropZone{ border: 2px dashed var(--border); border-radius: 24px; padding: 50px 20px; text-align: center; max-width: 900px; margin: 0 auto 50px; cursor: pointer; background: radial-gradient(circle, rgba(255,215,0,0.03) 0%, transparent 70%); transition: 0.3s; }
+#dropZone:hover { border-color: var(--accent); transform: scale(1.01); }
+#dropZone i { font-size: 3rem; color: var(--text-muted); margin-bottom: 15px; transition: 0.3s; }
+#dropZone:hover i { color: var(--accent); transform: translateY(-5px); }
+#dropZone p { color: var(--text-muted); margin: 0; font-size: 0.9rem; }
+#productsList{ max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.product-card{ background: var(--surface); border-radius: 20px; padding: 20px; display: grid; grid-template-columns: 180px 1fr 60px; gap: 25px; border: 1px solid var(--border); transition: 0.3s; align-items: start; }
+.product-card:hover { border-color: #333; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+.product-card img{ width: 100%; height: 180px; object-fit: cover; border-radius: 14px; border: 1px solid #333; }
+.card-inputs { display: flex; flex-direction: column; gap: 15px; }
+.input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; display: block; font-weight: 700; }
+input, textarea, select { background: var(--input-bg); border: 1px solid var(--border); color: #fff; padding: 12px 16px; border-radius: 10px; width: 100%; font-family: inherit; font-size: 0.9rem; transition: 0.3s; }
+input:focus, textarea:focus, select:focus { border-color: var(--accent); outline: none; }
+textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.price-wrapper { position: relative; }
+.price-wrapper span { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); font-weight: 700; z-index: 2; pointer-events: none; }
+.price-wrapper input { padding-left: 30px !important; color: var(--accent); font-weight: 600; }
+.btn{ padding: 10px 20px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
+.btn-save{ background: var(--accent); color: #000; }
+.btn-save:hover { background: #ffe033; }
+.btn-danger{ background: rgba(255, 75, 75, 0.1); color: var(--danger); border: 1px solid rgba(255, 75, 75, 0.2); }
+.btn-danger:hover { background: var(--danger); color: #fff; }
+.btn-success{ background: var(--success); color: #fff; }
+.action-col { display: flex; flex-direction: column; gap: 10px; }
+.btn-icon { width: 100%; aspect-ratio: 1; padding: 0; font-size: 1.2rem; border-radius: 12px; }
+@media (max-width: 700px) { .product-card { grid-template-columns: 1fr; gap: 15px; } .product-card img { height: 200px; width: 100%; } .action-col { flex-direction: row; } .btn-icon { width: 100%; height: 45px; aspect-ratio: auto; } }
+</style>
+</head>
+
+<body>
+
+<div id="loader">
+    <div class="spinner"></div>
+    <div style="color:white; font-weight:500;">Syncing...</div>
+</div>
+
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-icon"><i class="fas fa-fingerprint"></i></div>
+    <h2>ADMIN ACCESS</h2>
+    <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="clientPassword" placeholder="Enter Admin Password">
+    </div>
+    <button onclick="checkAdmin()">AUTHENTICATE</button>
+    <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> Invalid Password</div>
+  </div>
+</div>
+
+<div id="adminPanel">
+  <div class="admin-header">
+    <h1><i class="fas fa-layer-group"></i> <span>CONTENT MANAGER</span></h1>
+    <div class="header-actions">
+      <button class="btn btn-danger" onclick="removeAll()"><i class="fas fa-trash-alt"></i> CLEAR</button>
+      <button class="btn btn-save" onclick="saveAll(true)"><i class="fas fa-cloud-upload-alt"></i> SAVE ALL</button>
+    </div>
+  </div>
+  <div id="dropZone">
+    <i class="fas fa-cloud-arrow-up"></i>
+    <h3>Upload Media</h3>
+    <p>Drag images here or click to browse</p>
+  </div>
+  <div id="productsList"></div>
+  <div style="text-align:center; padding:20px;">
+    <a id="liveLink" href="#" target="_blank" style="color:var(--accent); text-decoration:none;">View Live Menu <i class="fas fa-external-link-alt"></i></a>
+  </div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+// AUTO-DETECT REPO: We get the repo name from the subdomain (e.g. burger-king.pages.dev)
+const REPO_NAME = window.location.hostname.split('.')[0];
+const GITHUB_USERNAME = "arbyrudra";
+const BRANCH = "main";
+// Use RAW URL to ensure we get the latest data even if Cloudflare build is excluded
+const MENU_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/data/menu.json?v=${Date.now()}`;
+
+let products = [];
+let currentConfig = {}; 
+let password = "";
+
+function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+
+function checkAdmin(){
+  password = document.getElementById("clientPassword").value.trim();
+
+  if(password){
+    loadInitialData();
+  } else {
+    document.getElementById("loginError").style.display="block";
+  }
+}
+
+/* ================= LOAD DATA ================= */
+async function loadInitialData() {
+    showLoader(true);
+    try {
+        const res = await fetch(MENU_URL);
+        
+        if(res.ok) {
+            const data = await res.json();
+            currentConfig = data.config || {};
+            products = data.items || [];
+            
+            // Fix absolute image paths for preview
+            products = products.map(p => {
+                if(p.image && !p.image.startsWith('http')) {
+                    p.preview = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/${p.image}`;
+                } else {
+                    p.preview = p.image;
+                }
+                return p;
+            });
+
+            document.getElementById("loginScreen").style.display="none";
+            document.getElementById("adminPanel").style.display="block";
+            document.getElementById("liveLink").href = window.location.origin;
+
+            render();
+        } else {
+            alert("Error: data/menu.json not found. Make sure you created it in the repo!");
+        }
+    } catch(e) {
+        console.log("Error loading data.");
+        alert("System Error. Could not fetch menu data.");
+    }
+    showLoader(false);
+}
+
+// ================= SECURE SAVE =================
+async function githubPut(path, content, message){
+  const response = await fetch('/api/save', {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: path,
+      content: content,
+      message: message,
+      password: password 
+    })
+  });
+
+  if(!response.ok) {
+      if(response.status === 401) {
+          alert("❌ Incorrect Password!");
+          location.reload();
+      }
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Save Failed");
+  }
+  return response.json();
+}
+
+function compressImage(file){
+  return new Promise(resolve=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      const img=new Image();
+      img.src=e.target.result;
+      img.onload=()=>{
+        const c=document.createElement("canvas");
+        const ctx=c.getContext("2d");
+        const ratio = 800/img.width;
+        c.width=800; c.height=img.height*ratio;
+        ctx.drawImage(img,0,0,c.width,c.height);
+        resolve(c.toDataURL("image/jpeg",0.7));
+      };
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function render(){
+  const list=document.getElementById("productsList");
+  list.innerHTML="";
+  
+  products.forEach((p,i)=>{
+    const d=document.createElement("div");
+    d.className="product-card";
+    let displayPrice = p.price ? p.price.toString().replace('₹', '').trim() : '';
+    const tagOptions = ["Veg", "Non-Veg", "Spicy", "Cafe Special", "Chef's Choice", "Sweet", "Beverage", "Bestseller"];
+    let optionsHtml = tagOptions.map(opt => `<option value="${opt}" ${p.tag === opt ? 'selected' : ''}>${opt}</option>`).join('');
+
+    d.innerHTML=`
+      <img src="${p.preview}">
+      <div class="card-inputs">
+        <div class="input-row">
+            <div><label>Title</label><input value="${p.title}" oninput="products[${i}].title=this.value"></div>
+            <div><label>Price</label><div class="price-wrapper"><span>₹</span><input type="number" value="${displayPrice}" placeholder="250" oninput="products[${i}].price=this.value"></div></div>
+        </div>
+        <div class="input-row">
+             <div><label>Ingredients</label><input value="${p.ingredients || ''}" placeholder="Cheese, Bun" oninput="products[${i}].ingredients=this.value"></div>
+            <div><label>Tag</label><select onchange="products[${i}].tag=this.value"><option value="">Select...</option>${optionsHtml}</select></div>
+        </div>
+        <div><label>Description</label><textarea placeholder="Describe taste..." oninput="products[${i}].desc=this.value">${p.desc}</textarea></div>
+      </div>
+      <div class="action-col">
+        <button class="btn btn-save btn-icon" title="Save" onclick="saveItem(${i}, this)"><i class="fas fa-save"></i></button>
+        <button class="btn btn-danger btn-icon" title="Delete" onclick="removeItem(${i})"><i class="fas fa-trash-alt"></i></button>
+      </div>
+    `;
+    list.appendChild(d);
+  });
+}
+
+function removeItem(i){ if(confirm("Delete item?")) { products.splice(i,1); render(); } }
+function removeAll(){ if(confirm("Remove ALL items?")) { products=[]; render(); } }
+
+async function saveItem(index, btn) {
+    const originalContent = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    await saveAll(false);
+    btn.classList.add('btn-success'); btn.classList.remove('btn-save'); btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => {
+        btn.classList.remove('btn-success'); btn.classList.add('btn-save'); btn.innerHTML = originalContent;
+    }, 2000);
+}
+
+async function saveAll(showAlert = true){
+  if(showAlert) showLoader(true);
+  
+  // PRESERVE CONFIG OBJECT WHEN SAVING
+  const fullData = {
+      config: currentConfig,
+      items: products.map(p=>({
+        title:p.title, 
+        price: '₹' + (p.price ? p.price.toString().replace('₹', '').trim() : '0'), 
+        desc:p.desc, 
+        ingredients:p.ingredients || "", 
+        tag:p.tag || "", 
+        image:p.image
+      }))
+  };
+
+  try {
+      const content = btoa(unescape(encodeURIComponent(JSON.stringify(fullData,null,2))));
+      // Note: save.js handles the path targeting (data/menu.json) automatically
+      await githubPut("menu.json", content, "Update menu");
+      if(showAlert) { showLoader(false); alert("✅ Updated!"); }
+  } catch(e) {
+      showLoader(false); alert("❌ Error: " + e.message);
+  }
+}
+
+async function handleFiles(files){
+  const limit = currentConfig.max_items || 10;
+  if(products.length >= limit) {
+      alert(`⚠️ Plan Limit Reached! Max ${limit} items allowed.`);
+      return;
+  }
+
+  showLoader(true);
+  for(const file of files){
+    const base64=await compressImage(file);
+    const name=`dish-${Date.now()}.jpg`;
+    const cleanBase64 = base64.split(',')[1]; 
+    // Save to images folder
+    await githubPut(`images/${name}`, cleanBase64, "Upload image");
+    
+    products.unshift({
+      title:"New Dish", price:"199", desc:"", ingredients:"", tag:"Veg",
+      image:`images/${name}`, preview: base64 
+    });
+  }
+  render();
+  showLoader(false);
+}
+
+const dz=document.getElementById("dropZone");
+dz.onclick=()=>{ const i=document.createElement("input"); i.type="file"; i.multiple=true; i.accept="image/*"; i.onchange=e=>handleFiles(e.target.files); i.click(); };
+dz.ondragover=e=>e.preventDefault();
+dz.ondrop=e=>{ e.preventDefault(); handleFiles(e.dataTransfer.files); };
+</script>
+</body>
+</html>

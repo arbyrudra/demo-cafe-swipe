@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
+    <title>Menu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #1a0a0a; 
+            --accent: #FFD700; 
+            --card-w: 340px;
+            --card-h: 500px;
+            --ease: cubic-bezier(0.23, 1, 0.32, 1);
+            --font-head: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body { 
+            background: radial-gradient(circle at center, #2c0e0e 0%, var(--bg) 100%); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            font-family: var(--font-body); 
+            overflow: hidden; 
+            color: white; 
+        }
+
+        /* --- INTRO --- */
+        #intro-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s; }
+        .intro-logo { width: 80px; height: 80px; border: 3px solid var(--accent); display: flex; justify-content: center; align-items: center; font-family: var(--font-head); font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-bottom: 20px; }
+
+        /* --- GHOST HAND INSTRUCTION --- */
+        #instruction-layer { position: absolute; z-index: 2000; pointer-events: none; display: flex; flex-direction: column; align-items: center; opacity: 0; transition: opacity 0.6s ease; }
+        .ghost-hand { font-size: 50px; color: var(--accent); filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); animation: handGesture 1.2s infinite; }
+        @keyframes handGesture { 0% { opacity: 0; transform: translateX(0); } 20% { opacity: 1; } 50% { transform: translateX(60px) rotate(10deg); } 100% { opacity: 0; transform: translateX(0); } }
+        .hint-text { margin-top: 20px; font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: var(--accent); font-weight: 800; text-align: center; }
+
+        /* --- STACK --- */
+        .stack-container { position: relative; width: var(--card-w); height: var(--card-h); perspective: 2000px; visibility: hidden; opacity: 0; transition: opacity 1s; margin-bottom: 50px; }
+        .card { position: absolute; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s var(--ease), opacity 0.6s var(--ease); cursor: grab; }
+        .card.is-flipped { transform: rotateY(180deg) !important; }
+        .card-face { position: absolute; inset: 0; backface-visibility: hidden; border-radius: 25px; overflow: hidden; border: 1px solid rgba(255, 215, 0, 0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.6); }
+        .card-front { background: #111; }
+        .card-front img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+        .front-overlay { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(26, 10, 10, 0.95) 0%, transparent 60%); padding: 35px; display: flex; flex-direction: column; justify-content: flex-end; pointer-events: none; }
+        .tag-badge { background: var(--accent); color: #000; font-weight: 800; font-size: 0.6rem; padding: 4px 12px; align-self: flex-start; margin-bottom: 12px; letter-spacing: 1px; border-radius: 2px; }
+        .card-back { background: #1a0a0a; transform: rotateY(180deg); padding: 40px 30px; display: flex; flex-direction: column; border: 2px solid var(--accent); }
+        .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-right: 5px; }
+        .badge.veg { background: #1b4d2e; color: #4ade80; }
+        .badge.spicy { background: #4d1b1b; color: #f87171; }
+        .badge.signature { background: var(--accent); color: black; }
+        .badge.non-veg { background: #4d1b1b; color: #f87171; }
+        .back-title { font-family: var(--font-head); font-size: 1.8rem; color: var(--accent); margin-bottom: 10px; }
+        .back-details { font-size: 0.85rem; color: #d1c4c4; line-height: 1.6; margin-bottom: 25px; max-height: 120px; overflow: hidden; }
+        .chip { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; color: #eee; border: 1px solid rgba(255,215,0,0.2); margin: 3px; display: inline-block; }
+        .price-tag { margin-top: auto; font-size: 1.6rem; font-weight: 800; color: var(--accent); border-top: 1px solid rgba(255,215,0,0.2); padding-top: 20px; }
+        .social-dock { display: flex; gap: 25px; background: rgba(255, 215, 0, 0.05); backdrop-filter: blur(15px); padding: 15px 35px; border-radius: 50px; border: 1px solid rgba(255, 215, 0, 0.2); }
+        .social-link { color: var(--accent); font-size: 1.3rem; transition: all 0.3s; }
+        .social-link:hover { transform: scale(1.2); color: #fff; }
+        @media (max-width: 400px) { :root { --card-w: 310px; --card-h: 470px; } }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <div class="intro-logo">NB</div>
+        <p style="letter-spacing: 5px; font-weight: 300; font-size: 0.7rem; color: var(--accent);">ROYAL CURATORS</p>
+    </div>
+
+    <div id="instruction-layer">
+        <i class="fas fa-hand-pointer ghost-hand"></i>
+        <div class="hint-text">Swipe to Explore • Tap to Flip</div>
+    </div>
+
+    <div class="stack-container" id="mainStack"></div>
+
+    <div class="social-dock">
+        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="social-link"><i class="fas fa-globe"></i></a>
+    </div>
+
+<script>
+    /* ---------------- AUDIO SYSTEM ---------------- */
+    const swipeSound = new Audio("swipe.mp3");
+    const flipSound  = new Audio("tap.mp3");
+    
+    document.body.addEventListener("touchstart", () => {
+        swipeSound.play().then(() => swipeSound.pause()).catch(() => {});
+        flipSound.play().then(() => flipSound.pause()).catch(() => {});
+    }, {once:true});
+
+    function playSfx(type) {
+        const sound = type === 'tap' ? flipSound : swipeSound;
+        sound.currentTime = 0;
+        sound.volume = type === 'tap' ? 0.45 : 0.2;
+        sound.play().catch(e => {});
+    }
+
+    /* ---------------- CONFIG & DATA ---------------- */
+    // AUTO-DETECT REPO: We get the repo name from the subdomain (e.g. burger-king.pages.dev)
+    const REPO_NAME = window.location.hostname.split('.')[0];
+    const GITHUB_USERNAME = "arbyrudra";
+    const BRANCH = "main";
+    const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/`;
+    
+    // Fetch Menu from RAW GitHub (bypasses Cloudflare cache/build delays)
+    const MENU_URL = RAW_BASE + `data/menu.json?v=` + Date.now();
+
+    /* ---------------- STATE ---------------- */
+    let menuData = [];
+    let cardElements = [];
+    let isDragging = false, startX = 0, dragDiff = 0;
+    let isTap = true, tapStartY = 0;
+
+    const container = document.getElementById("mainStack");
+    const instruction = document.getElementById("instruction-layer");
+
+    /* ---------------- FETCH MENU ---------------- */
+    async function loadMenu() {
+        try {
+            const res = await fetch(MENU_URL);
+            if(!res.ok) throw new Error("Client Config Not Found");
+            
+            const fullData = await res.json();
+            
+            // Apply Theme Config
+            if(fullData.config) applyTheme(fullData.config);
+            
+            // Get Items
+            menuData = fullData.items || [];
+            
+            // Fix Image Paths (Must point to Github Raw)
+            menuData.forEach(i => {
+                if(!i.image.startsWith('http')) {
+                    i.image = RAW_BASE + i.image;
+                }
+            });
+        } catch(e) {
+            console.error("Error loading menu", e);
+            document.getElementById("intro-overlay").innerHTML = "<h2 style='color:var(--accent)'>Menu Not Found</h2>";
+        }
+    }
+
+    function applyTheme(config) {
+        const root = document.documentElement;
+        if(config.theme_color) root.style.setProperty('--accent', config.theme_color);
+        if(config.font) root.style.setProperty('--font-head', config.font);
+        
+        if(config.show_social === false) {
+            document.querySelector('.social-dock').style.display = 'none';
+        }
+    }
+
+    /* ---------------- INITIALIZATION ---------------- */
+    async function init() {
+        await loadMenu();
+        if (menuData.length === 0) return;
+
+        menuData.forEach(item => {
+            const card = document.createElement("div");
+            card.className = "card";
+
+            const displayTag = item.tag || "SPECIAL";
+            const price = item.price.includes('₹') ? item.price : '₹' + item.price;
+
+            const ingredientsHTML = (Array.isArray(item.ingredients)
+                ? item.ingredients
+                : (item.ingredients || "").toString().split(',')
+            ).map(i => `<span class="chip">${i.trim()}</span>`).join('');
+
+            card.innerHTML = `
+            <div class="card-face card-front">
+                <img src="${item.image}">
+                <div class="front-overlay">
+                    <div class="tag-badge">${displayTag}</div>
+                    <h2 style="font-family:var(--font-head); font-size:1.8rem;">${item.title}</h2>
+                </div>
+            </div>
+            <div class="card-face card-back">
+                <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:5px;">
+                   <span class="badge signature">Chef's Choice</span>
+                </div>
+                <h2 class="back-title">${item.title}</h2>
+                <p class="back-details">${item.desc}</p>
+                <div style="display:flex; flex-wrap:wrap;">
+                    ${ingredientsHTML}
+                </div>
+                <div class="price-tag">${price}</div>
+            </div>`;
+
+            container.appendChild(card);
+            cardElements.push(card);
+
+            card.addEventListener("mousedown", startDrag);
+            card.addEventListener("touchstart", startDrag, {passive: true});
+        });
+
+        setTimeout(() => {
+            document.getElementById("intro-overlay").style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById("intro-overlay").remove();
+                container.style.visibility = "visible";
+                container.style.opacity = "1";
+                render();
+                showInstruction(); 
+            }, 800);
+        }, 2000);
+    }
+
+    /* ---------------- INSTRUCTION ---------------- */
+    function showInstruction() {
+        instruction.style.opacity = "1";
+        let count = 0;
+        const loop = setInterval(() => {
+            count++;
+            if (count >= 3) {
+                clearInterval(loop);
+                instruction.style.opacity = "0";
+                setTimeout(() => instruction.remove(), 600);
+            }
+        }, 1200);
+    }
+
+    /* ---------------- RENDER ---------------- */
+    function render() {
+        cardElements.forEach((card, i) => {
+            card.style.zIndex = cardElements.length - i;
+            if (i < 4) {
+                card.style.display = "block";
+                card.style.pointerEvents = i === 0 ? "auto" : "none";
+                let rot = 0;
+                if (i === 1) rot = -6;
+                else if (i === 2) rot = 5;
+                else if (i === 3) rot = -3;
+                let scale = 1 - (i * 0.04);
+                card.style.transform = `scale(${scale}) rotate(${rot}deg)`;
+                card.style.opacity = 1;
+            } else {
+                card.style.display = "none";
+            }
+        });
+    }
+
+    /* ---------------- DRAG & SWIPE ---------------- */
+    function startDrag(e) {
+        const card = cardElements[0];
+        if (isDragging || !card) return;
+
+        isDragging = true;
+        isTap = true;
+        startX = e.touches ? e.touches[0].clientX : e.clientX;
+        tapStartY = e.touches ? e.touches[0].clientY : e.clientY;
+        card.style.transition = "none";
+
+        const move = ev => {
+            const x = ev.touches ? ev.touches[0].clientX : ev.clientX;
+            const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
+            dragDiff = x - startX;
+            if (Math.abs(dragDiff) > 8 || Math.abs(y - tapStartY) > 8) isTap = false;
+            if(Math.abs(dragDiff) > 10) instruction.style.opacity = "0";
+            card.style.transform = `translateX(${dragDiff}px) rotate(${dragDiff / 15}deg)`;
+        };
+
+        const end = () => {
+            isDragging = false;
+            card.style.transition = "transform .45s var(--ease), opacity .3s";
+            if (isTap) {
+                playSfx('tap');
+                card.classList.toggle("is-flipped");
+                reset(card);
+            } else if (Math.abs(dragDiff) > 120 && !card.classList.contains("is-flipped")) {
+                swipe(card, dragDiff > 0 ? 1 : -1);
+            } else reset(card);
+            dragDiff = 0;
+            window.removeEventListener("mousemove", move);
+            window.removeEventListener("mouseup", end);
+            window.removeEventListener("touchmove", move);
+            window.removeEventListener("touchend", end);
+        };
+
+        window.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", end);
+        window.addEventListener("touchmove", move);
+        window.addEventListener("touchend", end);
+    }
+
+    function reset(card) {
+        card.style.transform = "translateX(0) rotate(0deg)";
+    }
+
+    function swipe(card, dir) {
+        playSfx('swipe');
+        card.style.opacity = "0";
+        card.style.transform = `translateX(${dir * 700}px) rotate(${dir * 25}deg)`;
+        setTimeout(() => {
+            card.classList.remove("is-flipped");
+            card.style.opacity = "1";
+            card.style.transform = "none";
+            cardElements.push(cardElements.shift());
+            render();
+        }, 350);
+    }
+
+    init();
+</script>
+</body>
+</html>
