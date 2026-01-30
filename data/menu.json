@@ -3,27 +3,11 @@
   "items": [
     {
       "title": "New Dish",
-      "price": "₹199",
-      "desc": "qwertyuioplkjhgfdszxvbn",
-      "ingredients": "asd asd asd asd ",
-      "tag": "Chef's Choice",
-      "image": "images/dish-1769761069969.jpg"
-    },
-    {
-      "title": "New Dish",
       "price": "₹2999",
       "desc": "qazxcvbnmklkjhgfdwertyuiijbsdfgb",
       "ingredients": "qazwsx dcrfv tgbyhn ",
       "tag": "Veg",
       "image": "images/dish-1769761063875.jpg"
-    },
-    {
-      "title": "New Dish",
-      "price": "₹399",
-      "desc": "qakjertyukikwertyuhjkmnbvgfdfghjm,kmnb cvd",
-      "ingredients": "ertyjdfghcvb xcvbnsdfgh erty sdfg cvbn",
-      "tag": "Sweet",
-      "image": "images/dish-1769761059989.jpg"
     },
     {
       "title": "New Dish",
