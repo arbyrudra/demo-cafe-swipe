@@ -38,18 +38,18 @@
       "image": "images/dish-1769862283811.jpg"
     },
     {
-      "title": "New Dish",
-      "price": "₹199",
-      "desc": "",
-      "ingredients": "",
-      "tag": "New",
-      "badges": "",
+      "title": "Handi Chicken Biryani",
+      "price": "₹699",
+      "desc": "Aromatic long-grain basmati rice cooked with tender chicken and authentic spices in a traditional clay pot. Served with cooling Raita.",
+      "ingredients": "Basmati Rice, Chicken, Saffron, Whole Spices, Raita",
+      "tag": "Must Try",
+      "badges": "Non-Veg, Spicy, Bestseller",
       "image": "images/dish-1769862280966.jpg"
     },
     {
       "title": "Classic North Indian Thali",
       "price": "₹349",
-      "desc": "",
+      "desc": "A wholesome platter featuring Aloo Gobi, Dal Tadka, Jeera Rice, fresh Chapatis, and a crunchy side salad.",
       "ingredients": "Aloo Gobi, Dal, Rice, Chapati, Salad",
       "tag": "Full Meal",
       "badges": "Veg, Spicy, Bestseller",
