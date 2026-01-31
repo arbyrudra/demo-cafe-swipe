@@ -20,22 +20,13 @@
       "image": "images/dish-1769862288723.jpg"
     },
     {
-      "title": "New Dish",
-      "price": "₹199",
-      "desc": "",
-      "ingredients": "",
-      "tag": "New",
-      "badges": "",
+      "title": "Chicken Roulade & Brioche",
+      "price": "₹749",
+      "desc": "Tender rolled chicken slices served with crispy toasted brioche and a balsamic berry reduction for a sweet and savory balance.",
+      "ingredients": "Chicken, Brioche Toast, Berry Reduction, Herbs",
+      "tag": "New Item",
+      "badges": "Non-Veg, Chef's Choice",
       "image": "images/dish-1769862286129.jpg"
-    },
-    {
-      "title": "New Dish",
-      "price": "₹199",
-      "desc": "",
-      "ingredients": "",
-      "tag": "New",
-      "badges": "",
-      "image": "images/dish-1769862283811.jpg"
     },
     {
       "title": "Handi Chicken Biryani",
