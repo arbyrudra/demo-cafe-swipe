@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer">
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{ --bg: #0b0b0f; --surface: #15151a; --input-bg: #000000; --border: #2a2a35; --accent: #FFD700; --accent-glow: rgba(255, 215, 0, 0.2); --danger: #ff4b4b; --success: #00d26a; --text-main: #ffffff; --text-muted: #8f8f9b; }
@@ -57,7 +57,7 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 .action-col { display: flex; flex-direction: column; gap: 10px; }
 .btn-icon { width: 100%; aspect-ratio: 1; padding: 0; font-size: 1.2rem; border-radius: 12px; }
 
-/* --- NEW CHECKBOX STYLES --- */
+/* CHECKBOX STYLES */
 .checkbox-group { display: flex; flex-wrap: wrap; gap: 8px; background: var(--input-bg); border: 1px solid var(--border); padding: 10px; border-radius: 10px; min-height: 48px; }
 .checkbox-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; background: #222; padding: 6px 12px; border-radius: 20px; border: 1px solid #333; transition: 0.2s; user-select: none; color: #ccc; text-transform: none; margin: 0; font-weight: 500; }
 .checkbox-item:hover { border-color: var(--accent); color: white; }
@@ -109,11 +109,10 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 
 <script>
 /* ================= CONFIG ================= */
-// AUTO-DETECT REPO: We get the repo name from the subdomain (e.g. burger-king.pages.dev)
+// AUTO-DETECT REPO from URL
 const REPO_NAME = window.location.hostname.split('.')[0];
 const GITHUB_USERNAME = "arbyrudra";
 const BRANCH = "main";
-// Use RAW URL to ensure we get the latest data even if Cloudflare build is excluded
 const MENU_URL = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/data/menu.json?v=${Date.now()}`;
 
 let products = [];
@@ -124,7 +123,6 @@ function showLoader(show) { document.getElementById('loader').style.display = sh
 
 function checkAdmin(){
   password = document.getElementById("clientPassword").value.trim();
-
   if(password){
     loadInitialData();
   } else {
@@ -143,7 +141,6 @@ async function loadInitialData() {
             currentConfig = data.config || {};
             products = data.items || [];
             
-            // Fix absolute image paths for preview
             products = products.map(p => {
                 if(p.image && !p.image.startsWith('http')) {
                     p.preview = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/${p.image}`;
@@ -159,10 +156,9 @@ async function loadInitialData() {
 
             render();
         } else {
-            alert("Error: data/menu.json not found. Make sure you created it in the repo!");
+            alert("Error: data/menu.json not found. Check GitHub!");
         }
     } catch(e) {
-        console.log("Error loading data.");
         alert("System Error. Could not fetch menu data.");
     }
     showLoader(false);
@@ -215,7 +211,7 @@ function render(){
   const list=document.getElementById("productsList");
   list.innerHTML="";
   
-  // Options for the BACK of the card (Multi-select)
+  // Options for Back Tags (Multi-Select)
   const backTagOptions = ["Veg", "Non-Veg", "Spicy", "Chef's Choice", "Sweet", "Beverage", "Bestseller"];
 
   products.forEach((p,i)=>{
@@ -223,8 +219,7 @@ function render(){
     d.className="product-card";
     let displayPrice = p.price ? p.price.toString().replace('₹', '').trim() : '';
 
-    // --- BACK TAGS (Checkboxes) ---
-    // Reads from 'p.badges' instead of 'p.tag'
+    // --- BACK BADGES GENERATOR ---
     const currentBadges = (p.badges || "").split(',').map(t => t.trim());
     
     let checkboxHtml = backTagOptions.map(opt => `
@@ -247,11 +242,11 @@ function render(){
              <div><label>Ingredients</label><input value="${p.ingredients || ''}" placeholder="Cheese, Bun" oninput="products[${i}].ingredients=this.value"></div>
              <div>
                 <label>Front Tag (Manual)</label>
-                <input type="text" value="${p.tag || ''}" placeholder="e.g. New" oninput="products[${i}].tag=this.value">
+                <input type="text" value="${p.tag || ''}" placeholder="e.g. 50% OFF" oninput="products[${i}].tag=this.value">
             </div>
         </div>
         <div>
-            <label>Back Tags (Multi-Select)</label>
+            <label>Back Tags (Select Multiple)</label>
             <div id="badge-group-${i}" class="checkbox-group">
                 ${checkboxHtml}
             </div>
@@ -267,13 +262,10 @@ function render(){
   });
 }
 
-// --- NEW FUNCTION TO HANDLE BACK BADGES ---
 function updateBadges(index) {
     const group = document.getElementById(`badge-group-${index}`);
     const checkboxes = group.querySelectorAll('input[type="checkbox"]:checked');
     const selected = Array.from(checkboxes).map(cb => cb.value);
-    
-    // Join tags into a string like "Veg, Spicy" and save to 'badges' field
     products[index].badges = selected.join(', ');
 }
 
@@ -293,7 +285,6 @@ async function saveItem(index, btn) {
 async function saveAll(showAlert = true){
   if(showAlert) showLoader(true);
   
-  // PRESERVE CONFIG OBJECT WHEN SAVING
   const fullData = {
       config: currentConfig,
       items: products.map(p=>({
@@ -301,15 +292,14 @@ async function saveAll(showAlert = true){
         price: '₹' + (p.price ? p.price.toString().replace('₹', '').trim() : '0'), 
         desc:p.desc, 
         ingredients:p.ingredients || "", 
-        tag:p.tag || "",         // Front Tag (Text)
-        badges:p.badges || "",   // Back Tags (List string)
+        tag:p.tag || "",         // Front Manual Tag
+        badges:p.badges || "",   // Back Checkbox Tags
         image:p.image
       }))
   };
 
   try {
       const content = btoa(unescape(encodeURIComponent(JSON.stringify(fullData,null,2))));
-      // Note: save.js handles the path targeting (data/menu.json) automatically
       await githubPut("menu.json", content, "Update menu");
       if(showAlert) { showLoader(false); alert("✅ Updated!"); }
   } catch(e) {
@@ -329,7 +319,6 @@ async function handleFiles(files){
     const base64=await compressImage(file);
     const name=`dish-${Date.now()}.jpg`;
     const cleanBase64 = base64.split(',')[1]; 
-    // Save to images folder
     await githubPut(`images/${name}`, cleanBase64, "Upload image");
     
     products.unshift({
