@@ -3,11 +3,19 @@
   "items": [
     {
       "title": "New Dish",
-      "price": "₹2999",
-      "desc": "qazxcvbnmklkjhgfdwertyuiijbsdfgb",
-      "ingredients": "qazwsx dcrfv tgbyhn ",
+      "price": "₹199",
+      "desc": "QWDFGUIOL,MNBVCDSDFGH",
+      "ingredients": "GFDS HGFDS HGFDS ",
       "tag": "Veg",
-      "image": "images/dish-1769761063875.jpg"
+      "image": "images/dish-1769857917443.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "Veg",
+      "image": "images/dish-1769857914820.jpg"
     },
     {
       "title": "New Dish",
