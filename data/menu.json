@@ -6,7 +6,8 @@
       "price": "₹199",
       "desc": "QWDFGUIOL,MNBVCDSDFGH",
       "ingredients": "QWERT, YTREWQ, TREWQ,TREE",
-      "tag": "Non-Veg, Spicy, Sweet, Beverage, Bestseller",
+      "tag": "Spicy",
+      "badges": "Bestseller",
       "image": "images/dish-1769857917443.jpg"
     },
     {
@@ -15,6 +16,7 @@
       "desc": "",
       "ingredients": "QWERTYUYTREWQ, TREWQYTREW, YTREWQYTRE",
       "tag": "Non-Veg, Cafe Special, Chef's Choice",
+      "badges": "",
       "image": "images/dish-1769857914820.jpg"
     },
     {
@@ -23,6 +25,7 @@
       "desc": "mnbvcxjhgfduytr",
       "ingredients": "ytrewq,ytrewq,ytrewq,trewq",
       "tag": "Veg, Cafe Special, Beverage, Bestseller",
+      "badges": "",
       "image": "images/dish-1769761054684.jpg"
     }
   ]
