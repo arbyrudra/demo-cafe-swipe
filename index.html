@@ -167,25 +167,31 @@
             const card = document.createElement("div");
             card.className = "card";
 
-            const displayTag = item.tag || "SPECIAL";
+            // Front Tag (e.g. New)
+            const displayTag = item.tag || "";
             const price = item.price.includes('₹') ? item.price : '₹' + item.price;
 
+            // Ingredients List
             const ingredientsHTML = (Array.isArray(item.ingredients)
                 ? item.ingredients
                 : (item.ingredients || "").toString().split(',')
             ).map(i => `<span class="chip">${i.trim()}</span>`).join('');
 
+            // Back Badges (Split the 'badges' string into spans)
+            const badgesArr = (item.badges || "").split(',').filter(s => s.trim());
+            const badgesHTML = badgesArr.map(b => `<span class="badge signature">${b.trim()}</span>`).join('');
+
             card.innerHTML = `
             <div class="card-face card-front">
                 <img src="${item.image}">
                 <div class="front-overlay">
-                    <div class="tag-badge">${displayTag}</div>
+                    ${displayTag ? `<div class="tag-badge">${displayTag}</div>` : ''}
                     <h2 style="font-family:var(--font-head); font-size:1.8rem;">${item.title}</h2>
                 </div>
             </div>
             <div class="card-face card-back">
                 <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:5px;">
-                   <span class="badge signature">Chef's Choice</span>
+                   ${badgesHTML}
                 </div>
                 <h2 class="back-title">${item.title}</h2>
                 <p class="back-details">${item.desc}</p>
