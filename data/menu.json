@@ -56,12 +56,12 @@
       "image": "images/dish-1769862278180.jpg"
     },
     {
-      "title": "New Dish",
-      "price": "₹199",
-      "desc": "",
-      "ingredients": "",
-      "tag": "New",
-      "badges": "",
+      "title": "Glazed Pork Belly",
+      "price": "₹849",
+      "desc": "Slow-cooked pork belly with a sticky honey-soy glaze, served with a delicate crispy tuile and herb oil. ",
+      "ingredients": "Pork Belly, Honey, Soy Glaze, Tuile, Microgreens",
+      "tag": "Gourmet",
+      "badges": "Non-Veg, Chef's Choice, Bestseller",
       "image": "images/dish-1769862275816.jpg"
     },
     {
