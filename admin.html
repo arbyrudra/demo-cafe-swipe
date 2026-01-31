@@ -56,6 +56,51 @@ textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
 .btn-success{ background: var(--success); color: #fff; }
 .action-col { display: flex; flex-direction: column; gap: 10px; }
 .btn-icon { width: 100%; aspect-ratio: 1; padding: 0; font-size: 1.2rem; border-radius: 12px; }
+
+/* --- NEW CHECKBOX STYLES --- */
+.checkbox-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    padding: 10px;
+    border-radius: 10px;
+    min-height: 48px;
+}
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background: #222;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid #333;
+    transition: 0.2s;
+    user-select: none;
+    color: #ccc;
+    text-transform: none;
+    margin: 0; /* Override label margin */
+    font-weight: 500;
+}
+.checkbox-item:hover {
+    border-color: var(--accent);
+    color: white;
+}
+.checkbox-item input {
+    width: auto;
+    margin: 0;
+    accent-color: var(--accent);
+}
+/* Style for checked items */
+.checkbox-item:has(input:checked) {
+    background: rgba(255, 215, 0, 0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
 @media (max-width: 700px) { .product-card { grid-template-columns: 1fr; gap: 15px; } .product-card img { height: 200px; width: 100%; } .action-col { flex-direction: row; } .btn-icon { width: 100%; height: 45px; aspect-ratio: auto; } }
 </style>
 </head>
@@ -207,12 +252,25 @@ function render(){
   const list=document.getElementById("productsList");
   list.innerHTML="";
   
+  const tagOptions = ["Veg", "Non-Veg", "Spicy", "Cafe Special", "Chef's Choice", "Sweet", "Beverage", "Bestseller"];
+
   products.forEach((p,i)=>{
     const d=document.createElement("div");
     d.className="product-card";
     let displayPrice = p.price ? p.price.toString().replace('₹', '').trim() : '';
-    const tagOptions = ["Veg", "Non-Veg", "Spicy", "Cafe Special", "Chef's Choice", "Sweet", "Beverage", "Bestseller"];
-    let optionsHtml = tagOptions.map(opt => `<option value="${opt}" ${p.tag === opt ? 'selected' : ''}>${opt}</option>`).join('');
+
+    // --- CHECKBOX GENERATOR ---
+    // Split current string "Veg, Spicy" into array ["Veg", "Spicy"]
+    const currentTags = (p.tag || "").split(',').map(t => t.trim());
+    
+    let checkboxHtml = tagOptions.map(opt => `
+        <label class="checkbox-item">
+            <input type="checkbox" value="${opt}" 
+                ${currentTags.includes(opt) ? 'checked' : ''} 
+                onchange="updateTags(${i})"> 
+            ${opt}
+        </label>
+    `).join('');
 
     d.innerHTML=`
       <img src="${p.preview}">
@@ -223,7 +281,12 @@ function render(){
         </div>
         <div class="input-row">
              <div><label>Ingredients</label><input value="${p.ingredients || ''}" placeholder="Cheese, Bun" oninput="products[${i}].ingredients=this.value"></div>
-            <div><label>Tag</label><select onchange="products[${i}].tag=this.value"><option value="">Select...</option>${optionsHtml}</select></div>
+             <div>
+                <label>Tags</label>
+                <div id="tag-group-${i}" class="checkbox-group">
+                    ${checkboxHtml}
+                </div>
+            </div>
         </div>
         <div><label>Description</label><textarea placeholder="Describe taste..." oninput="products[${i}].desc=this.value">${p.desc}</textarea></div>
       </div>
@@ -234,6 +297,16 @@ function render(){
     `;
     list.appendChild(d);
   });
+}
+
+// --- NEW FUNCTION TO HANDLE TAG UPDATES ---
+function updateTags(index) {
+    const group = document.getElementById(`tag-group-${index}`);
+    const checkboxes = group.querySelectorAll('input[type="checkbox"]:checked');
+    const selected = Array.from(checkboxes).map(cb => cb.value);
+    
+    // Join tags into a string like "Veg, Spicy"
+    products[index].tag = selected.join(', ');
 }
 
 function removeItem(i){ if(confirm("Delete item?")) { products.splice(i,1); render(); } }
