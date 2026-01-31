@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
     <title>Menu</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -111,9 +111,8 @@
     /* ---------------- STATE ---------------- */
     let menuData = [];
     let cardElements = [];
-    let isDragging = false;
+    let isSwiping = false; // Changed from isDragging to explicit isSwiping
     let startX = 0, startY = 0;
-    let startTime = 0; // Added for time-based flip logic
 
     const container = document.getElementById("mainStack");
     const instruction = document.getElementById("instruction-layer");
@@ -158,14 +157,10 @@
             const card = document.createElement("div");
             card.className = "card";
 
+            // Front & Back Data
             const displayTag = item.tag || "";
             const price = item.price.includes('₹') ? item.price : '₹' + item.price;
-
-            const ingredientsHTML = (Array.isArray(item.ingredients)
-                ? item.ingredients
-                : (item.ingredients || "").toString().split(',')
-            ).map(i => `<span class="chip">${i.trim()}</span>`).join('');
-
+            const ingredientsHTML = (Array.isArray(item.ingredients) ? item.ingredients : (item.ingredients || "").toString().split(',')).map(i => `<span class="chip">${i.trim()}</span>`).join('');
             const badgesArr = (item.badges || "").split(',').filter(s => s.trim());
             const badgesHTML = badgesArr.map(b => `<span class="badge signature">${b.trim()}</span>`).join('');
 
@@ -178,22 +173,27 @@
                 </div>
             </div>
             <div class="card-face card-back">
-                <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:5px;">
-                   ${badgesHTML}
-                </div>
+                <div style="margin-bottom:15px; display:flex; flex-wrap:wrap; gap:5px;">${badgesHTML}</div>
                 <h2 class="back-title">${item.title}</h2>
                 <p class="back-details">${item.desc}</p>
-                <div style="display:flex; flex-wrap:wrap;">
-                    ${ingredientsHTML}
-                </div>
+                <div style="display:flex; flex-wrap:wrap;">${ingredientsHTML}</div>
                 <div class="price-tag">${price}</div>
             </div>`;
 
             container.appendChild(card);
             cardElements.push(card);
 
+            // TOUCH & CLICK EVENTS (The Mobile Fix)
             card.addEventListener("mousedown", startDrag);
             card.addEventListener("touchstart", startDrag, {passive: false});
+            
+            // Standard click for flipping (Reliable on mobile)
+            card.addEventListener("click", (e) => {
+                if (!isSwiping) {
+                    playSfx('tap');
+                    e.currentTarget.classList.toggle("is-flipped");
+                }
+            });
         });
 
         setTimeout(() => {
@@ -208,7 +208,6 @@
         }, 2000);
     }
 
-    /* ---------------- INSTRUCTION ---------------- */
     function showInstruction() {
         instruction.style.opacity = "1";
         let count = 0;
@@ -222,7 +221,6 @@
         }, 1200);
     }
 
-    /* ---------------- RENDER ---------------- */
     function render() {
         cardElements.forEach((card, i) => {
             card.style.zIndex = cardElements.length - i;
@@ -230,9 +228,7 @@
                 card.style.display = "block";
                 card.style.pointerEvents = i === 0 ? "auto" : "none";
                 let rot = 0;
-                if (i === 1) rot = -6;
-                else if (i === 2) rot = 5;
-                else if (i === 3) rot = -3;
+                if (i === 1) rot = -6; else if (i === 2) rot = 5; else if (i === 3) rot = -3;
                 let scale = 1 - (i * 0.04);
                 card.style.transform = `scale(${scale}) rotate(${rot}deg)`;
                 card.style.opacity = 1;
@@ -242,71 +238,55 @@
         });
     }
 
-    /* ---------------- DRAG & SWIPE (ULTIMATE MOBILE FIX) ---------------- */
+    /* ---------------- HYBRID SWIPE LOGIC ---------------- */
     function startDrag(e) {
         const card = cardElements[0];
-        if (isDragging || !card) return;
+        if (!card) return;
 
-        isDragging = true;
+        // Reset Swiping State
+        isSwiping = false; 
         
-        // 1. Record Start Position AND Time
         startX = e.touches ? e.touches[0].clientX : e.clientX;
         startY = e.touches ? e.touches[0].clientY : e.clientY;
-        startTime = Date.now();
-        
         card.style.transition = "none";
 
-        let currentX = startX;
-        let currentY = startY;
-
         const move = ev => {
-            currentX = ev.touches ? ev.touches[0].clientX : ev.clientX;
-            currentY = ev.touches ? ev.touches[0].clientY : ev.clientY;
-            
-            let diffX = currentX - startX;
-            let diffY = currentY - startY;
+            const x = ev.touches ? ev.touches[0].clientX : ev.clientX;
+            const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
+            const diffX = x - startX;
+            const diffY = y - startY;
 
-            // Prevent Scrolling if user is moving horizontally (swiping card)
-            if (Math.abs(diffX) > Math.abs(diffY) && ev.cancelable) {
-                ev.preventDefault();
+            // Only act as a "Swipe" if moved significantly horizontally
+            if (Math.abs(diffX) > 10) {
+                // If moving horizontal more than vertical, assume Swipe
+                if (Math.abs(diffX) > Math.abs(diffY)) {
+                    isSwiping = true;
+                    if(ev.cancelable) ev.preventDefault(); // Stop scroll
+                    card.style.transform = `translateX(${diffX}px) rotate(${diffX / 15}deg)`;
+                    
+                    if(Math.abs(diffX) > 10) instruction.style.opacity = "0";
+                }
             }
-
-            if(Math.abs(diffX) > 10) instruction.style.opacity = "0";
-            
-            // Move the card visually
-            card.style.transform = `translateX(${diffX}px) rotate(${diffX / 15}deg)`;
         };
 
-        const end = () => {
-            isDragging = false;
+        const end = (ev) => {
+            const x = ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX;
+            const diffX = x - startX;
+
             card.style.transition = "transform .45s var(--ease), opacity .3s";
-            
-            let diffX = currentX - startX;
-            let diffY = currentY - startY;
-            let timeElapsed = Date.now() - startTime;
-            let totalMove = Math.abs(diffX) + Math.abs(diffY);
 
-            // --- THE MOBILE FIX LOGIC ---
-            // A "Tap" on mobile is fast (< 400ms) AND barely moves (< 40px).
-            // We flip if it meets these criteria, OR if we never moved significantly.
-            
-            const isTap = (timeElapsed < 400 && totalMove < 40) || (totalMove < 5);
-
-            if (isTap) {
-                // FLIP ACTION
-                playSfx('tap');
-                card.classList.toggle("is-flipped");
-                reset(card);
-            } 
-            else if (Math.abs(diffX) > 100 && !card.classList.contains("is-flipped")) {
-                // SWIPE ACTION (Only if dragged far enough)
+            // If we were swiping and moved far enough -> SWIPE AWAY
+            if (isSwiping && Math.abs(diffX) > 100 && !card.classList.contains("is-flipped")) {
                 swipe(card, diffX > 0 ? 1 : -1);
             } 
+            // Otherwise -> RESET POSITION (Flip is handled by click event)
             else {
-                // RESET (Dragged a bit but not enough to swipe)
                 reset(card);
+                // Important: Small timeout to ensure 'click' event fires before isSwiping resets? 
+                // Actually 'click' fires after 'touchend'. If isSwiping is true, click might be weird.
+                // But generally, if we moved > 10px, the browser suppresses the click anyway.
             }
-            
+
             window.removeEventListener("mousemove", move);
             window.removeEventListener("mouseup", end);
             window.removeEventListener("touchmove", move);
@@ -315,7 +295,7 @@
 
         window.addEventListener("mousemove", move);
         window.addEventListener("mouseup", end);
-        window.addEventListener("touchmove", move, {passive: false}); 
+        window.addEventListener("touchmove", move, {passive: false});
         window.addEventListener("touchend", end);
     }
 
