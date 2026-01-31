@@ -4,7 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
     <title>Menu</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer">
+    
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -61,10 +63,7 @@
         .social-link { color: var(--accent); font-size: 1.3rem; transition: all 0.3s; }
         .social-link:hover { transform: scale(1.2); color: #fff; }
         
-        /* Mobile Scaling Fix */
-        @media (max-width: 400px) { 
-            :root { --card-w: 310px; --card-h: 470px; } 
-        }
+        @media (max-width: 400px) { :root { --card-w: 310px; --card-h: 470px; } }
     </style>
 </head>
 <body>
@@ -92,7 +91,6 @@
     const swipeSound = new Audio("swipe.mp3");
     const flipSound  = new Audio("tap.mp3");
     
-    // Unlock Audio Context on First Touch
     document.body.addEventListener("touchstart", () => {
         swipeSound.play().then(() => swipeSound.pause()).catch(() => {});
         flipSound.play().then(() => flipSound.pause()).catch(() => {});
@@ -106,13 +104,13 @@
     }
 
     /* ---------------- CONFIG & DATA ---------------- */
-    // AUTO-DETECT REPO: Works for any client automatically
+    // AUTO-DETECT REPO
     const REPO_NAME = window.location.hostname.split('.')[0];
     const GITHUB_USERNAME = "arbyrudra";
     const BRANCH = "main";
     const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/`;
     
-    // Using RAW URL to bypass build delay
+    // Using RAW URL with timestamp to bypass caching
     const MENU_URL = RAW_BASE + `data/menu.json?v=` + Date.now();
 
     /* ---------------- STATE ---------------- */
@@ -169,7 +167,7 @@
             const card = document.createElement("div");
             card.className = "card";
 
-            // FRONT TAG (From Manual Input)
+            // FRONT TAG (Manual)
             const displayTag = item.tag || "";
             const price = item.price.includes('₹') ? item.price : '₹' + item.price;
 
@@ -179,7 +177,7 @@
                 : (item.ingredients || "").toString().split(',')
             ).map(i => `<span class="chip">${i.trim()}</span>`).join('');
 
-            // BACK TAGS (From Checkboxes - stored in 'badges')
+            // BACK TAGS (Badges from Admin checkboxes)
             const badgesArr = (item.badges || "").split(',').filter(s => s.trim());
             const badgesHTML = badgesArr.map(b => `<span class="badge signature">${b.trim()}</span>`).join('');
 
@@ -206,14 +204,13 @@
             container.appendChild(card);
             cardElements.push(card);
 
-            // Add Mouse Events (PC)
+            // Mouse Events (PC)
             card.addEventListener("mousedown", startDrag);
-            
-            // Add Touch Events (Mobile) - 'passive: false' is KEY to preventing scroll while dragging
+            // Touch Events (Mobile) - passive: false stops scrolling
             card.addEventListener("touchstart", startDrag, {passive: false});
         });
 
-        // Show UI after loading
+        // Show UI
         setTimeout(() => {
             document.getElementById("intro-overlay").style.opacity = "0";
             setTimeout(() => {
@@ -260,7 +257,7 @@
         });
     }
 
-    /* ---------------- DRAG & SWIPE LOGIC ---------------- */
+    /* ---------------- DRAG & SWIPE ---------------- */
     function startDrag(e) {
         const card = cardElements[0];
         if (isDragging || !card) return;
@@ -268,7 +265,6 @@
         isDragging = true;
         isTap = true;
         
-        // Get Position (Touch vs Mouse)
         startX = e.touches ? e.touches[0].clientX : e.clientX;
         tapStartY = e.touches ? e.touches[0].clientY : e.clientY;
         
@@ -279,17 +275,12 @@
             const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
             dragDiff = x - startX;
             
-            // --- MOBILE FIX: SENSITIVITY ---
-            // If movement is > 20px, it's a DRAG.
-            // If movement is < 20px, we treat it as a CLICK (Flip).
-            // Phones are sensitive, fingers shake. 8px was too small.
+            // MOBILE SENSITIVITY FIX: 20px threshold
             if (Math.abs(dragDiff) > 20 || Math.abs(y - tapStartY) > 20) {
                 isTap = false;
-                // Prevent page scrolling while dragging card
-                if(ev.cancelable) ev.preventDefault(); 
+                if(ev.cancelable) ev.preventDefault(); // Stop Scroll
             }
             
-            // Hide instruction if user starts interacting
             if(Math.abs(dragDiff) > 10) instruction.style.opacity = "0";
             
             card.style.transform = `translateX(${dragDiff}px) rotate(${dragDiff / 15}deg)`;
@@ -299,33 +290,26 @@
             isDragging = false;
             card.style.transition = "transform .45s var(--ease), opacity .3s";
             
-            // TAP DETECTED -> FLIP
             if (isTap) {
                 playSfx('tap');
                 card.classList.toggle("is-flipped");
                 reset(card);
-            } 
-            // SWIPE DETECTED
-            else if (Math.abs(dragDiff) > 120 && !card.classList.contains("is-flipped")) {
+            } else if (Math.abs(dragDiff) > 120 && !card.classList.contains("is-flipped")) {
                 swipe(card, dragDiff > 0 ? 1 : -1);
-            } 
-            // CANCEL SWIPE (Return to center)
-            else {
+            } else {
                 reset(card);
             }
             
             dragDiff = 0;
-            // Clean up listeners
             window.removeEventListener("mousemove", move);
             window.removeEventListener("mouseup", end);
             window.removeEventListener("touchmove", move);
             window.removeEventListener("touchend", end);
         };
 
-        // Attach move/end listeners
         window.addEventListener("mousemove", move);
         window.addEventListener("mouseup", end);
-        window.addEventListener("touchmove", move, {passive: false}); // passive: false allows preventDefault
+        window.addEventListener("touchmove", move, {passive: false});
         window.addEventListener("touchend", end);
     }
 
