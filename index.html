@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no"/>
     <title>Menu</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" referrerpolicy="no-referrer">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -52,10 +52,7 @@
         .tag-badge { background: var(--accent); color: #000; font-weight: 800; font-size: 0.6rem; padding: 4px 12px; align-self: flex-start; margin-bottom: 12px; letter-spacing: 1px; border-radius: 2px; }
         .card-back { background: #1a0a0a; transform: rotateY(180deg); padding: 40px 30px; display: flex; flex-direction: column; border: 2px solid var(--accent); }
         .badge { padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-right: 5px; }
-        .badge.veg { background: #1b4d2e; color: #4ade80; }
-        .badge.spicy { background: #4d1b1b; color: #f87171; }
         .badge.signature { background: var(--accent); color: black; }
-        .badge.non-veg { background: #4d1b1b; color: #f87171; }
         .back-title { font-family: var(--font-head); font-size: 1.8rem; color: var(--accent); margin-bottom: 10px; }
         .back-details { font-size: 0.85rem; color: #d1c4c4; line-height: 1.6; margin-bottom: 25px; max-height: 120px; overflow: hidden; }
         .chip { background: rgba(255,255,255,0.05); padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; color: #eee; border: 1px solid rgba(255,215,0,0.2); margin: 3px; display: inline-block; }
@@ -104,13 +101,10 @@
     }
 
     /* ---------------- CONFIG & DATA ---------------- */
-    // AUTO-DETECT REPO: We get the repo name from the subdomain (e.g. burger-king.pages.dev)
     const REPO_NAME = window.location.hostname.split('.')[0];
     const GITHUB_USERNAME = "arbyrudra";
     const BRANCH = "main";
     const RAW_BASE = `https://raw.githubusercontent.com/${GITHUB_USERNAME}/${REPO_NAME}/${BRANCH}/`;
-    
-    // Fetch Menu from RAW GitHub (bypasses Cloudflare cache/build delays)
     const MENU_URL = RAW_BASE + `data/menu.json?v=` + Date.now();
 
     /* ---------------- STATE ---------------- */
@@ -130,13 +124,13 @@
             
             const fullData = await res.json();
             
-            // Apply Theme Config
+            // Apply Theme
             if(fullData.config) applyTheme(fullData.config);
             
             // Get Items
             menuData = fullData.items || [];
             
-            // Fix Image Paths (Must point to Github Raw)
+            // Fix Image Paths
             menuData.forEach(i => {
                 if(!i.image.startsWith('http')) {
                     i.image = RAW_BASE + i.image;
@@ -167,17 +161,18 @@
             const card = document.createElement("div");
             card.className = "card";
 
-            // Front Tag (e.g. New)
+            // FRONT TAG (MANUAL)
             const displayTag = item.tag || "";
             const price = item.price.includes('₹') ? item.price : '₹' + item.price;
 
-            // Ingredients List
+            // INGREDIENTS
             const ingredientsHTML = (Array.isArray(item.ingredients)
                 ? item.ingredients
                 : (item.ingredients || "").toString().split(',')
             ).map(i => `<span class="chip">${i.trim()}</span>`).join('');
 
-            // Back Badges (Split the 'badges' string into spans)
+            // BACK TAGS (MULTI-SELECT)
+            // We split the 'badges' string into individual spans
             const badgesArr = (item.badges || "").split(',').filter(s => s.trim());
             const badgesHTML = badgesArr.map(b => `<span class="badge signature">${b.trim()}</span>`).join('');
 
@@ -254,7 +249,7 @@
         });
     }
 
-    /* ---------------- DRAG & SWIPE ---------------- */
+    /* ---------------- DRAG & SWIPE (MOBILE FIX) ---------------- */
     function startDrag(e) {
         const card = cardElements[0];
         if (isDragging || !card) return;
@@ -269,7 +264,12 @@
             const x = ev.touches ? ev.touches[0].clientX : ev.clientX;
             const y = ev.touches ? ev.touches[0].clientY : ev.clientY;
             dragDiff = x - startX;
-            if (Math.abs(dragDiff) > 8 || Math.abs(y - tapStartY) > 8) isTap = false;
+            
+            // MOBILE FIX: Increased threshold from 8px to 20px
+            // Phones are sensitive; a finger "tap" often moves 10-15px.
+            // If movement is less than 20px, we still consider it a "Tap" (Flip).
+            if (Math.abs(dragDiff) > 20 || Math.abs(y - tapStartY) > 20) isTap = false;
+            
             if(Math.abs(dragDiff) > 10) instruction.style.opacity = "0";
             card.style.transform = `translateX(${dragDiff}px) rotate(${dragDiff / 15}deg)`;
         };
@@ -277,13 +277,20 @@
         const end = () => {
             isDragging = false;
             card.style.transition = "transform .45s var(--ease), opacity .3s";
+            
+            // FLIP LOGIC
             if (isTap) {
                 playSfx('tap');
                 card.classList.toggle("is-flipped");
                 reset(card);
-            } else if (Math.abs(dragDiff) > 120 && !card.classList.contains("is-flipped")) {
+            } 
+            // SWIPE LOGIC
+            else if (Math.abs(dragDiff) > 120 && !card.classList.contains("is-flipped")) {
                 swipe(card, dragDiff > 0 ? 1 : -1);
-            } else reset(card);
+            } else {
+                reset(card);
+            }
+            
             dragDiff = 0;
             window.removeEventListener("mousemove", move);
             window.removeEventListener("mouseup", end);
