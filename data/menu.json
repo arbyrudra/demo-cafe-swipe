@@ -4,29 +4,74 @@
     {
       "title": "New Dish",
       "price": "₹199",
-      "desc": "QWDFGUIOL,MNBVCDSDFGH",
-      "ingredients": "QWERT, YTREWQ, TREWQ,TREE",
-      "tag": "Spicy",
-      "badges": "Bestseller",
-      "image": "images/dish-1769857917443.jpg"
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1769862291805.jpg"
     },
     {
       "title": "New Dish",
       "price": "₹199",
       "desc": "",
-      "ingredients": "QWERTYUYTREWQ, TREWQYTREW, YTREWQYTRE",
-      "tag": "Non-Veg, Cafe Special, Chef's Choice",
+      "ingredients": "",
+      "tag": "New",
       "badges": "",
-      "image": "images/dish-1769857914820.jpg"
+      "image": "images/dish-1769862288723.jpg"
     },
     {
       "title": "New Dish",
-      "price": "₹899",
-      "desc": "mnbvcxjhgfduytr",
-      "ingredients": "ytrewq,ytrewq,ytrewq,trewq",
-      "tag": "Veg, Cafe Special, Beverage, Bestseller",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
       "badges": "",
-      "image": "images/dish-1769761054684.jpg"
+      "image": "images/dish-1769862286129.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1769862283811.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1769862280966.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1769862278180.jpg"
+    },
+    {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1769862275816.jpg"
+    },
+    {
+      "title": "Royal Gugra",
+      "price": "₹149",
+      "desc": "Traditional crispy dumplings filled with a rich mixture of sweet khoya, coconut, and crushed dry fruits. A festive classic.",
+      "ingredients": "Flour, Khoya, Dry Fruits, Sugar, Ghee",
+      "tag": "Festive Special",
+      "badges": "Veg, Chef's Choice, Sweet",
+      "image": "images/dish-1769862272880.jpg"
     }
   ]
 }
