@@ -36,15 +36,6 @@
       "tag": "Gourmet",
       "badges": "Non-Veg, Chef's Choice, Bestseller",
       "image": "images/dish-1769862275816.jpg"
-    },
-    {
-      "title": "Royal Gugra",
-      "price": "₹149",
-      "desc": "Traditional crispy dumplings filled with a rich mixture of sweet khoya, coconut, and crushed dry fruits. A festive classic.",
-      "ingredients": "Flour, Khoya, Dry Fruits, Sugar, Ghee",
-      "tag": "Festive Special",
-      "badges": "Veg, Chef's Choice, Sweet",
-      "image": "images/dish-1769862272880.jpg"
     }
   ]
 }
