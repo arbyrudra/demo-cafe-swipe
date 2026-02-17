@@ -2,6 +2,15 @@
   "config": {},
   "items": [
     {
+      "title": "New Dish",
+      "price": "₹199",
+      "desc": "",
+      "ingredients": "",
+      "tag": "New",
+      "badges": "",
+      "image": "images/dish-1771342678653.jpg"
+    },
+    {
       "title": "Chicken Roulade & Brioche",
       "price": "₹749",
       "desc": "Tender rolled chicken slices served with crispy toasted brioche and a balsamic berry reduction for a sweet and savory balance.",
